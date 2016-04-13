@@ -9,8 +9,7 @@ import cPickle as pickle
 import math
 import scipy.io
 
-from imagernn.solver import Solver
-from imagernn.imagernn_utils import decodeGenerator, eval_split
+from imagernn.imagernn_utils import decodeGenerator
 
 """
 This script is used to predict sentences for arbitrary images

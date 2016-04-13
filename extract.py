@@ -17,6 +17,7 @@ def createVideo(inputdir,outputdir,framerate):
 	global foldername
 	print '(6/6) CreateVideo: ' + inputdir
 	command = 'ffmpeg -y -r ' + str(framerate) + ' -f image2 -i "' + inputdir + '/frame-%6d.jpg" -c:v libx264 -pix_fmt yuv420p -tune fastdecode -tune zerolatency -profile:v baseline ' + outputdir
+	print(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
 	while proc.poll() is None:
 		line = proc.stdout.readline()
@@ -26,6 +27,7 @@ def createVideo(inputdir,outputdir,framerate):
 	#filename = inputdir + '/processed_' + foldername + '.mp4'
 	filename = 'videos/processed/processed_' + foldername + '.mp4'
 	command = 'ffmpeg -y -i '+inputdir+'/movie.mp4 -i '+inputdir+'/output.aac -c copy -bsf:a aac_adtstoasc -map 0:0 -map 1:0 ' + filename
+	print(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
 	while proc.poll() is None:
 		line = proc.stdout.readline()
@@ -68,6 +70,7 @@ def createImageOverlay(inputdir,framerate):
 def getImageSentence(inputdir,framerate):
 	print '(4/6) getImageSentence: ' + inputdir
 	command = 'python predict_on_images.py cv/model_checkpoint_coco_visionlab43.stanford.edu_lstm_11.14.p -r ' + inputdir
+	print(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
 	while proc.poll() is None:
 		line = proc.stdout.readline()
@@ -79,6 +82,7 @@ def getImageSentence(inputdir,framerate):
 def getImageFeatures(inputdir,framerate):
 	print '(3/6) getImageFeatures: ' + inputdir
 	command = 'python python_features/extract_features.py --caffe /caffe --model_def python_features/deploy_features.prototxt --model python_features/VGG_ILSVRC_16_layers.caffemodel --files '+inputdir+'/tasks.txt --out '+inputdir+'/features'
+	print(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
 	while proc.poll() is None:
 		line = proc.stdout.readline()
@@ -111,6 +115,7 @@ def extractVideo(inputdir, outputdir,framefreq):
 
     # get framerate
     command = 'ffmpeg -i '+inputdir+' 2>&1 | sed -n "s/.*, \(.*\) fp.*/\\1/p"'
+    print(command)
     framerate = '24'
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
     while proc.poll() is None:
@@ -121,6 +126,7 @@ def extractVideo(inputdir, outputdir,framefreq):
 
     # get video
     command = 'ffmpeg -i ' + inputdir + ' -framerate '+str(framerate)+' -y -f image2 ' + outputdir + '/frame-%06d.jpg'
+    print(command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
     while proc.poll() is None:
         line = proc.stdout.readline()
@@ -130,6 +136,7 @@ def extractVideo(inputdir, outputdir,framefreq):
 
 	# get audio
 	command = 'ffmpeg -i '+inputdir+' -y -map 0:1 -vn -acodec copy '+outputdir+'/output.aac'
+	print(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
 
 	while proc.poll() is None:
