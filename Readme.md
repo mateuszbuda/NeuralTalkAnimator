@@ -9,8 +9,13 @@ It takes a folder with videos and returns a folder with captuned videos back.
 2. Download [VGG_ILSVRC_16_layers.caffemodel](http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILSVRC_16_layers.caffemodel) and place it in the `python_features` folder  
 3. Download [coco_cnn_lstm_v2.p](https://cs.stanford.edu/people/karpathy/neuraltalk/coco_cnn_lstm_v2.zip) and place it in the `cv` folder  
 4. Put Your Videos in the the `videos` folder (as .mp4 or .mov or .avi files)
-5. `python extract.py --captionfrequency 30`   
-6. Get videos with generated captions at `videos/<video_file_name>`
+5. `python extract.py`
+6. Get result captions at `videos/<video_file_name>`
+
+## Parameters
+
+1. `python extract.py --captionfrequency 120` Caption Creation Frequency Per Frame (default value 120).
+2. `python extract.py --debug 1` if you want result.html with captioned images to be produced or `python extract.py` if you want cleanup that only keeps result_struct.json to be performed.
 
 ##Requirements
 - PIL   
