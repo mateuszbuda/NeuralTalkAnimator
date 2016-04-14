@@ -21,7 +21,7 @@ def drawOverlay(image, text):
 	img.save(image)
 
 
-def createImageOverlay(inputdir, framerate):
+def createImageOverlay(inputdir):
 	print '(5/5) createImageOverlay: ' + inputdir
 	foundimages = []
 	with open(inputdir + '/result_struct.json') as data_file:
@@ -29,26 +29,27 @@ def createImageOverlay(inputdir, framerate):
 		images = data['imgblobs']
 		for image in images:
 			imgpath = image['img_path']
-			imgtext = image['candidate']['text']  # '('+str(image['candidate']['logprob']) +') ' +
+			imgtext = image['candidate']['text']
 			newImage = [imgpath, imgtext]
 			foundimages.append(newImage)
 
-	frames = [f for f in listdir(inputdir) if isfile(join(inputdir, f))]
-	currenttext = ''
-	prevtext = ' '
 	print 'Creating Image Overlay'
+
+	for image in foundimages:
+		drawOverlay(inputdir + '/' + image[0], image[1])
+
+	frames = [f for f in listdir(inputdir) if isfile(join(inputdir, f))]
+	captionedFrames = [image[0] for image in foundimages]
+
 	for frame in frames:
 		if frame.endswith('.jpg') or frame.endswith('.png'):
-			for item in foundimages:
-				if item[0] == frame:
-					currenttext = item[1]
-					drawOverlay(inputdir + '/' + frame, currenttext)
-			if prevtext == currenttext:
+			if frame in captionedFrames:
+				continue
+			else:
 				try:
 					os.remove(inputdir + '/' + frame)
 				except OSError, e:
 					print(e)
-			prevtext = currenttext
 
 
 def getImageSentence(inputdir, framerate):
@@ -61,7 +62,7 @@ def getImageSentence(inputdir, framerate):
 		line = proc.stdout.readline()
 		print(line)
 
-	createImageOverlay(inputdir, framerate)
+	createImageOverlay(inputdir)
 
 
 def getImageFeatures(inputdir, framerate):
