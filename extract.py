@@ -47,7 +47,7 @@ def drawOverlay(image, text):
 
 
 def createImageOverlay(inputdir, framerate):
-	print '(5/6) createImageOverlay: ' + inputdir
+	print '(5/5) createImageOverlay: ' + inputdir
 	foundimages = []
 	with open(inputdir + '/result_struct.json') as data_file:
 		data = json.load(data_file)
@@ -60,20 +60,28 @@ def createImageOverlay(inputdir, framerate):
 
 	frames = [f for f in listdir(inputdir) if isfile(join(inputdir, f))]
 	currenttext = ''
-	print 'Creating Image Overlay For ' + str(len(frames)) + ' frames'
+	prevtext = ' '
+	print 'Creating Image Overlay'
 	for frame in frames:
 		if frame.endswith('.jpg') or frame.endswith('.png'):
 			for item in foundimages:
 				if item[0] == frame:
 					currenttext = item[1]
-			drawOverlay(inputdir + '/' + frame, currenttext)
+					drawOverlay(inputdir + '/' + frame, currenttext)
+			if prevtext == currenttext:
+				try:
+					os.remove(inputdir + '/' + frame)
+				except OSError, e:
+					print(e)
+			prevtext = currenttext
 
-	createVideo(inputdir, inputdir + '/movie.mp4', framerate)
+
+	# createVideo(inputdir, inputdir + '/movie.mp4', framerate)
 
 
 def getImageSentence(inputdir, framerate):
-	print '(4/6) getImageSentence: ' + inputdir
-	command = 'python predict_on_images.py cv/model_checkpoint_coco_visionlab43.stanford.edu_lstm_11.14.p -r ' + inputdir
+	print '(4/5) getImageSentence: ' + inputdir
+	command = 'python predict_on_images.py cv/model_checkpoint_coco_visionlab43.stanford.edu_lstm_11.14.p -r ' + inputdir + ' -f ' + framerate
 	print(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True,
 							universal_newlines=True)
@@ -85,7 +93,7 @@ def getImageSentence(inputdir, framerate):
 
 
 def getImageFeatures(inputdir, framerate):
-	print '(3/6) getImageFeatures: ' + inputdir
+	print '(3/5) getImageFeatures: ' + inputdir
 	command = 'python python_features/extract_features.py --caffe /caffe --model_def python_features/deploy_features.prototxt --model python_features/VGG_ILSVRC_16_layers.caffemodel --files ' + inputdir + '/tasks.txt --out ' + inputdir + '/features'
 	print(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True,
@@ -98,14 +106,14 @@ def getImageFeatures(inputdir, framerate):
 
 
 def addToList(inputdir, frameFreq, framerate):
-	print '(2/6) addToList: ' + inputdir
+	print '(2/5) addToList: ' + inputdir
 	frames = [f for f in listdir(inputdir) if isfile(join(inputdir, f))]
 	counter = frameFreq
 	open(inputdir + '/tasks.txt', 'w').close()
 	for frame in frames:
 		if frame.endswith('.jpg') or frame.endswith('.png'):
 			if counter >= frameFreq:
-				print frame
+				# print frame
 				with open(inputdir + '/tasks.txt', 'a') as textfile:
 					textfile.write(frame + '\n')
 				counter = 0
@@ -117,7 +125,7 @@ def addToList(inputdir, frameFreq, framerate):
 def extractVideo(inputdir, outputdir, framefreq):
 	if not os.path.exists(outputdir):
 		os.makedirs(outputdir)
-	print('(1/6) extractVideo: ' + inputdir + ' To: ' + outputdir)
+	print('(1/5) extractVideo: ' + inputdir + ' To: ' + outputdir)
 
 	# get framerate
 	command = 'ffmpeg -i ' + inputdir + ' 2>&1 | sed -n "s/.*, \(.*\) fp.*/\\1/p"'

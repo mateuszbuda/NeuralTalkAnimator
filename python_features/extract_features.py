@@ -93,7 +93,7 @@ def batch_predict(filenames, net):
         for j in range(len(batch_range)):
             allftrs[i+j,:] = ftrs[j,:]
 
-        print 'Done %d/%d files' % (i+len(batch_range), len(filenames))
+        print('Done %d/%d files' % (i+len(batch_range), len(filenames)))
 
     return allftrs
 
