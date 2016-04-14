@@ -31,6 +31,7 @@ def main(params):
 	misc = { }
 	misc['wordtoix'] = checkpoint['wordtoix']
 	ixtoword = checkpoint['ixtoword']
+	debug = params['debug']
 
 	# output blob which we will dump to JSON for visualizing the results
 	blob = {
@@ -81,13 +82,14 @@ def main(params):
 	json.dump(blob, open(save_file, 'w'))
 
 	# dump output html
-	html = ''
-	for img in blob['imgblobs']:
-		html += '<img src="%s" height="400"><br>' % (img['img_path'],)
-		html += '(%f) %s <br><br>' % (img['candidate']['logprob'], img['candidate']['text'])
-	html_file = os.path.join(root_path, 'result.html')
-	print 'writing html result file to %s...' % (html_file,)
-	open(html_file, 'w').write(html)
+	if debug > 0:
+		html = ''
+		for img in blob['imgblobs']:
+			html += '<img src="%s" height="400"><br>' % (img['img_path'],)
+			html += '(%f) %s <br><br>' % (img['candidate']['logprob'], img['candidate']['text'])
+		html_file = os.path.join(root_path, 'result.html')
+		print 'writing html result file to %s...' % (html_file,)
+		open(html_file, 'w').write(html)
 
 
 if __name__ == "__main__":
@@ -99,6 +101,7 @@ if __name__ == "__main__":
 	parser.add_argument('-b', '--beam_size', type=int, default=1,
 						help='beam size in inference. 1 indicates greedy per-word max procedure. Good value is approx 20 or so, and more = better.')
 	parser.add_argument('-f', '--framerate', type=str, default='0', help='source video of images frame rate')
+	parser.add_argument('-d', '--debug', type=int, default=0, help='In debug mode additional html file with overlaid images is created')
 
 	args = parser.parse_args()
 	params = vars(args)  # convert to ordinary dict

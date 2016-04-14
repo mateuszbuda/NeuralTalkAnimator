@@ -52,9 +52,9 @@ def createImageOverlay(inputdir):
 					print(e)
 
 
-def getImageSentence(inputdir, framerate):
+def getImageSentence(inputdir, framerate, debug):
 	print '(4/5) getImageSentence: ' + inputdir
-	command = 'python predict_on_images.py cv/model_checkpoint_coco_visionlab43.stanford.edu_lstm_11.14.p -r ' + inputdir + ' -f ' + framerate
+	command = 'python predict_on_images.py cv/model_checkpoint_coco_visionlab43.stanford.edu_lstm_11.14.p -r ' + inputdir + ' -f ' + framerate + ' -d ' + str(debug)
 	print(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True,
 							universal_newlines=True)
@@ -65,7 +65,7 @@ def getImageSentence(inputdir, framerate):
 	createImageOverlay(inputdir)
 
 
-def getImageFeatures(inputdir, framerate):
+def getImageFeatures(inputdir, framerate, debug):
 	print '(3/5) getImageFeatures: ' + inputdir
 	command = 'python python_features/extract_features.py --caffe /caffe --model_def python_features/deploy_features.prototxt --model python_features/VGG_ILSVRC_16_layers.caffemodel --files ' + inputdir + '/tasks.txt --out ' + inputdir + '/features'
 	print(command)
@@ -75,10 +75,10 @@ def getImageFeatures(inputdir, framerate):
 		line = proc.stdout.readline()
 		print(line)
 
-	getImageSentence(inputdir, framerate)
+	getImageSentence(inputdir, framerate, debug)
 
 
-def addToList(inputdir, frameFreq, framerate):
+def addToList(inputdir, frameFreq, framerate, debug):
 	print '(2/5) addToList: ' + inputdir
 	frames = [f for f in listdir(inputdir) if isfile(join(inputdir, f))]
 	counter = frameFreq
@@ -92,10 +92,10 @@ def addToList(inputdir, frameFreq, framerate):
 				counter = 0
 			counter += 1
 
-	getImageFeatures(inputdir, framerate)
+	getImageFeatures(inputdir, framerate, debug)
 
 
-def extractVideo(inputdir, outputdir, framefreq):
+def extractVideo(inputdir, outputdir, framefreq, debug):
 	if not os.path.exists(outputdir):
 		os.makedirs(outputdir)
 	print('(1/5) extractVideo: ' + inputdir + ' To: ' + outputdir)
@@ -134,14 +134,28 @@ def extractVideo(inputdir, outputdir, framefreq):
 		while proc.poll() is None:
 			line = proc.stdout.readline()
 
-	addToList(outputdir, framefreq, framerate)
+	addToList(outputdir, framefreq, framerate, debug)
+
+
+def cleanup(inputdir):
+	files = [f for f in listdir(inputdir) if isfile(join(inputdir, f))]
+
+	for file in files:
+		if file != 'result_struct.json':
+			try:
+				os.remove(inputdir + '/' + file)
+			except OSError, e:
+				print(e)
 
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='VideoCaptionGenerator')
 	parser.add_argument('-f', '--captionfrequency', help='Caption Creation Frequency Per Frame.', type=int, default=120)
+	parser.add_argument('-d', '--debug', help='In debug mode additional html file with overlaid images is created', type=int, default=0)
+
 	args = parser.parse_args()
 
+	debug = args.debug
 	captionfrequency = args.captionfrequency
 
 	print '***************************************'
@@ -157,7 +171,10 @@ if __name__ == "__main__":
 		if video.endswith('.mp4') or video.endswith('.mov') or video.endswith('.avi'):
 			print 'Processing: ' + video
 			foldername = os.path.splitext(video)[0]
-			extractVideo(mypath + video, mypath + foldername, captionfrequency)
+			extractVideo(mypath + video, mypath + foldername, captionfrequency, debug)
+
+	if debug == 0:
+		cleanup(mypath + foldername)
 
 	print ''
 	print '********* PROCESSED ALL ************'
