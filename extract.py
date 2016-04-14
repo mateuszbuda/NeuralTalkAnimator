@@ -3,7 +3,6 @@ __author__ = 'Samim.io'
 
 import argparse
 import os
-import errno
 import subprocess
 from os import listdir
 from os.path import isfile, join
@@ -11,30 +10,6 @@ import json
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
-
-
-def createVideo(inputdir, outputdir, framerate):
-	global foldername
-	print '(6/6) CreateVideo: ' + inputdir
-	command = 'ffmpeg -y -r ' + str(
-		framerate) + ' -f image2 -i "' + inputdir + '/frame-%6d.jpg" -c:v libx264 -pix_fmt yuv420p -tune fastdecode -tune zerolatency -profile:v baseline ' + outputdir
-	print(command)
-	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True,
-							universal_newlines=True)
-	while proc.poll() is None:
-		line = proc.stdout.readline()
-		print(line + '\n')
-
-	print 'Adding Audio: ' + inputdir
-	# filename = inputdir + '/processed_' + foldername + '.mp4'
-	filename = 'videos/processed/processed_' + foldername + '.mp4'
-	command = 'ffmpeg -y -i ' + inputdir + '/movie.mp4 -i ' + inputdir + '/output.aac -c copy -bsf:a aac_adtstoasc -map 0:0 -map 1:0 ' + filename
-	print(command)
-	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True,
-							universal_newlines=True)
-	while proc.poll() is None:
-		line = proc.stdout.readline()
-		print(line + '\n')
 
 
 def drawOverlay(image, text):
@@ -74,9 +49,6 @@ def createImageOverlay(inputdir, framerate):
 				except OSError, e:
 					print(e)
 			prevtext = currenttext
-
-
-	# createVideo(inputdir, inputdir + '/movie.mp4', framerate)
 
 
 def getImageSentence(inputdir, framerate):
@@ -160,20 +132,16 @@ def extractVideo(inputdir, outputdir, framefreq):
 
 		while proc.poll() is None:
 			line = proc.stdout.readline()
-		# print(line + '\n')
 
 	addToList(outputdir, framefreq, framerate)
 
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='VideoCaptionGenerator')
-	parser.add_argument('-f', '--captionfrequency', help='Caption Creation Frequency Per Frame.', type=int,
-						required=False)
+	parser.add_argument('-f', '--captionfrequency', help='Caption Creation Frequency Per Frame.', type=int, default=120)
 	args = parser.parse_args()
 
 	captionfrequency = args.captionfrequency
-	if args.captionfrequency is None:
-		captionfrequency = 30
 
 	print '***************************************'
 	print '******** GENERATING CAPTIONS **********'
@@ -190,4 +158,6 @@ if __name__ == "__main__":
 			foldername = os.path.splitext(video)[0]
 			extractVideo(mypath + video, mypath + foldername, captionfrequency)
 
+	print ''
 	print '********* PROCESSED ALL ************'
+	print ''

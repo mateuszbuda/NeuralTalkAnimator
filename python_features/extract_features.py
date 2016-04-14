@@ -104,7 +104,6 @@ else:
     caffe.set_mode_cpu()
 
 net = caffe.Net(args.model_def, args.model, caffe.TEST)
-#caffe.set_phase_test()
 
 filenames = []
 
@@ -121,4 +120,4 @@ if args.out:
     with open(args.out, 'w') as fp:
         pickle.dump(allftrs, fp)
 
-scipy.io.savemat(os.path.join(base_dir, 'vgg_feats.mat'), mdict =  {'feats': np.transpose(allftrs)})
+scipy.io.savemat(os.path.join(base_dir, 'vgg_feats.mat'), mdict={'feats': np.transpose(allftrs)})
