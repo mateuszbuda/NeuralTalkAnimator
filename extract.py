@@ -3,6 +3,7 @@ __author__ = 'Samim.io'
 
 import argparse
 import os
+import shutil
 import subprocess
 from os import listdir
 from os.path import isfile, join
@@ -140,12 +141,26 @@ def extractVideo(inputdir, outputdir, framefreq, debug):
 def cleanup(inputdir):
 	files = [f for f in listdir(inputdir) if isfile(join(inputdir, f))]
 
+	# remove everything but result_struct.json
 	for file in files:
 		if file != 'result_struct.json':
 			try:
 				os.remove(inputdir + '/' + file)
 			except OSError, e:
 				print(e)
+
+	path = os.path.splitext(inputdir)
+
+	try:
+		os.rename(inputdir + '/result_struct.json', path[0] + '.json')
+	except OSError, e:
+		print(e)
+	try:
+		shutil.rmtree(inputdir, ignore_errors=True)
+	except OSError, e:
+		print(e)
+
+
 
 
 if __name__ == "__main__":
