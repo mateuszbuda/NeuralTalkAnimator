@@ -3,6 +3,9 @@ import json
 import os
 import cPickle as pickle
 import scipy.io
+import nltk
+from nltk.corpus import wordnet as wn
+from sets import Set
 
 from imagernn.imagernn_utils import decodeGenerator
 
@@ -32,6 +35,7 @@ def main(params):
 	misc['wordtoix'] = checkpoint['wordtoix']
 	ixtoword = checkpoint['ixtoword']
 	debug = params['debug']
+	framerate = float(params['framerate'])
 
 	# output blob which we will dump to JSON for visualizing the results
 	blob = {
@@ -67,6 +71,8 @@ def main(params):
 		# build up the output
 		img_blob = { }
 		img_blob['img_path'] = img['local_file_path']
+		# file number * captionfrequency * framerate
+		img_blob['time [s]'] = (int(img['local_file_path'][6:-4]) - 1) / framerate
 
 		# encode the top prediction
 		top_predictions = Ys[0]  # take predictions for the first (and only) image we passed in
@@ -74,6 +80,7 @@ def main(params):
 		candidate = ' '.join([ixtoword[ix] for ix in top_prediction[1] if ix > 0])  # ix 0 is the END token, skip that
 		print 'PRED: (%f) %s' % (top_prediction[0], candidate)
 		img_blob['candidate'] = { 'text': candidate, 'logprob': top_prediction[0] }
+		img_blob['extended'] = extendText(candidate)
 		blob['imgblobs'].append(img_blob)
 
 	# dump result struct to file
@@ -91,6 +98,30 @@ def main(params):
 		print 'writing html result file to %s...' % (html_file,)
 		open(html_file, 'w').write(html)
 
+
+def extendText(text):
+	tokens = nltk.pos_tag(text.split())
+	nouns = [word for word,pos in tokens if pos=='NN']
+
+	ext = Set()
+
+	for noun in nouns:
+		ss = wn.synsets(noun)
+
+		for s in ss:
+			for path in s.hypernym_paths():
+				for h in path[5:]:
+					for name in h.lemma_names():
+						for w in name.split('_'):
+							ext.add(w)
+
+			for h in s.hyponyms():
+				for name in h.lemma_names():
+					for w in name.split('_'):
+						ext.add(w)
+
+	extended = ' '.join(ext)
+	return (text + ' ' + extended).strip()
 
 if __name__ == "__main__":
 
