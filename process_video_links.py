@@ -17,7 +17,12 @@ if __name__ == "__main__":
 		links = f.readlines()
 
 	for link in links:
-		yt = YouTube(link)
+		try:
+			yt = YouTube(link)
+		except Exception as e:
+			print e
+			continue
+
 		yt.set_filename(link.rstrip().split('=')[1])
 
 		video = yt.filter('mp4')[-1]
