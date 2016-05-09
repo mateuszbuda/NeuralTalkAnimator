@@ -63,7 +63,8 @@ def getImageSentence(inputdir, framerate, debug):
 		line = proc.stdout.readline()
 		print(line)
 
-	createImageOverlay(inputdir)
+	if debug > 0:
+		createImageOverlay(inputdir)
 
 
 def getImageFeatures(inputdir, framerate, debug):
@@ -152,7 +153,7 @@ def cleanup(inputdir):
 	path = os.path.splitext(inputdir)
 
 	try:
-		os.rename(inputdir + '/result_struct.json', path[0] + '.json')
+		os.rename(inputdir + '/result_struct.json', path[0] + '_d')
 	except OSError, e:
 		print(e)
 	try:

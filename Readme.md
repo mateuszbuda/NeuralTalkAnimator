@@ -19,7 +19,9 @@ It takes a folder with videos and returns a folder with captuned videos back.
 
 ##Requirements
 - PIL   
-- FFMPEG  
+- FFMPEG
+- nltk, wordnet, pos tagger
+- pytube
 
 ##Demo
 
