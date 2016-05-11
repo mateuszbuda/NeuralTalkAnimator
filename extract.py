@@ -69,7 +69,7 @@ def getImageSentence(inputdir, framerate, debug):
 
 def getImageFeatures(inputdir, framerate, debug):
 	print '(3/5) getImageFeatures: ' + inputdir
-	command = 'python python_features/extract_features.py --caffe /caffe --model_def python_features/deploy_features.prototxt --model python_features/VGG_ILSVRC_16_layers.caffemodel --files ' + inputdir + '/tasks.txt --out ' + inputdir + '/features'
+	command = 'python python_features/extract_features.py --caffe /caffe --model_def python_features/VGG_CNN_S_deploy.prototxt --model python_features/VGG_CNN_S.caffemodel --files ' + inputdir + '/tasks.txt --out ' + inputdir + '/features'
 	print(command)
 	proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True,
 							universal_newlines=True)
@@ -153,7 +153,7 @@ def cleanup(inputdir):
 	path = os.path.splitext(inputdir)
 
 	try:
-		os.rename(inputdir + '/result_struct.json', path[0] + '_d')
+		os.rename(inputdir + '/result_struct.json', path[0] + '_e')
 	except OSError, e:
 		print(e)
 	try:

@@ -6,7 +6,7 @@ It takes a folder with videos and returns a folder with captuned videos back.
 ##Instruction
 0. Install caffe with pycaffe
 1. Download this repo  
-2. Download [VGG_ILSVRC_16_layers.caffemodel](http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILSVRC_16_layers.caffemodel) and place it in the `python_features` folder  
+2. Download [VGG_CNN_S.caffemodel](https://gist.github.com/ksimonyan/fd8800eeb36e276cd6f9#file-vgg_cnn_s_deploy-prototxt) and place it in the `python_features` folder  
 3. Download [coco_cnn_lstm_v2.p](https://cs.stanford.edu/people/karpathy/neuraltalk/coco_cnn_lstm_v2.zip) and place it in the `cv` folder  
 4. Put Your Videos in the the `videos` folder (as .mp4 or .mov or .avi files)
 5. `python extract.py`
